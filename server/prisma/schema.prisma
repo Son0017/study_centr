@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType{
+  ADMIN
+  TEACHER
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  first_name String
+  last_name String?
+  phone_number String @unique()
+  password String
+  type UserType
+  summa Float?
+  payout_percentage Float
+  course Course[]
+  Payout TeacherSolary[]
+}
+
+model Room {
+  id Int @id @default(autoincrement())
+  name String
+  capacity String
+  course Course[] 
+}
+
+model Student {
+  id Int @id @default(autoincrement())
+  first_name String
+  last_name String
+  phone_number String 
+  visited_date DateTime?
+  status Boolean
+  course StudentsCourses[]
+  debts StudentDebt[]
+}
+
+model Course {
+  id Int @id @default(autoincrement())
+  name String?
+  subject String
+  price Float
+  time String
+  duration String?
+  started_data DateTime?
+  week_days String?
+  status Boolean
+  room_id Int
+  teacher_id Int
+  attendance Attendance[]
+  students StudentsCourses[]
+  studentDebt StudentDebt[]
+  room Room @relation(fields: [room_id],references: [id])
+  teacher User @relation(fields: [teacher_id],references: [id])
+}
+
+model Attendance {
+  id Int @id @default(autoincrement())
+  date DateTime 
+  attendace Json
+  course_id Int
+  course Course @relation(fields: [course_id],references: [id])
+}
+
+model StudentsCourses{
+  student_acsept_date DateTime?
+  debt_summa Float
+  course_id Int
+  student_id Int 
+  course Course @relation(fields: [course_id],references: [id])
+  student Student @relation(fields: [student_id],references: [id])
+  @@id([student_id,course_id])
+}
+
+model StudentDebt {
+  id Int @id @default(autoincrement())
+  student_id Int
+  course_id Int
+  summa Float
+  debt_summa Boolean
+  teacher_payout Float
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+  course Course @relation(fields: [course_id],references: [id])
+  student Student @relation(fields: [student_id],references: [id])
+}
+
+model TeacherSolary{
+  id Int @id @default(autoincrement())
+  summa Float
+  teacher_id Int
+  teacher User @relation(fields: [teacher_id],references: [id])
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
