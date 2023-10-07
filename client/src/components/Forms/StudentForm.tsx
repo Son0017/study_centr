@@ -1,29 +1,45 @@
-// import React from 'react'
-
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Form, Input } from "antd";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHook";
 import { selectDraw, setClose } from "../../context/drawerSlicde";
 import axiosFetch from "../../utils/axiosFetch";
+import { editTableData, pushTableData } from "../../context/appSlice";
 
 const FormDisabledDemo: React.FC = () => {
   const dispatch = useAppDispatch();
-
   const draw = useAppSelector(selectDraw);
+  const [form] = Form.useForm();
 
-  const onFinish = async () => {
+  useEffect(() => {
+    if (draw.open) {
+      form.resetFields();
+    }
+  }, [draw]);
+
+  const onFinish = async (value: any) => {
     try {
-      const data = await axiosFetch("studentDebt/" + draw.initialValues.id, {
-        method: "PATCH",
+      const id = draw.initialValues ? "/" + draw.initialValues.id : "";
+      let sendValue: any = {};
+      if (draw.method === "POST") {
+        sendValue.visited_date = draw.method === "POST" && new Date();
+        sendValue.status = draw.method === "POST" && false;
+      }
+
+      const data = await axiosFetch("student" + id, {
+        method: draw.method,
         data: {
-          debt_summa: false,
+          ...value,
+          ...sendValue,
         },
       });
-
-      console.log(data.data);
-
-      if (data.data) {
+      if (data.data?.succes) {
+        if (draw.method === "POST") {
+          dispatch(pushTableData(data.data.data));
+        } else {
+          dispatch(editTableData(data.data.data));
+        }
         dispatch(setClose());
+        form.resetFields();
       }
     } catch (error) {
       console.log(error);
@@ -31,25 +47,41 @@ const FormDisabledDemo: React.FC = () => {
   };
 
   return (
-    <>
-      <Form
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 14 }}
-        onFinish={onFinish}
-        layout="horizontal"
-        initialValues={draw.initialValues}
-        style={{ maxWidth: 600 }}
+    <Form
+      name="basic"
+      initialValues={draw.initialValues}
+      onFinish={onFinish}
+      form={form}
+      autoComplete="off"
+    >
+      <Form.Item
+        label=" Ism"
+        name="first_name"
+        rules={[{ required: true, message: "Iltimos ism kiriting" }]}
       >
-        <Form.Item label="Summa" name={"summa"}>
-          <Input width={draw.width ? draw.width : 400} disabled />
-        </Form.Item>
-        <Form.Item label="Button">
-          <Button type="primary" htmlType="submit">
-            To`lov
-          </Button>
-        </Form.Item>
-      </Form>
-    </>
+        <Input />
+      </Form.Item>
+      <Form.Item
+        label="Familiya"
+        name="last_name"
+        rules={[{ required: true, message: "Iltimos familia kiriting" }]}
+      >
+        <Input />
+      </Form.Item>
+
+      <Form.Item
+        label="Telefon raqam"
+        name="phone_number"
+        rules={[{ required: true, message: "Iltimos telefon raqam kiriting" }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Saqlash
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

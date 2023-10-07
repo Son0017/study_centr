@@ -8,6 +8,7 @@ const teacher_controllers_1 = require("../controllers/teacher.controllers");
 const auth_1 = require("../auth/auth");
 const router = express_1.default.Router();
 router.get("/", auth_1.auth, teacher_controllers_1.getTeacher);
+router.get("/:id", auth_1.auth, teacher_controllers_1.getTeacher);
 router.get("/admin", auth_1.auth, teacher_controllers_1.getAdmin);
 router.patch("/:id", auth_1.auth, teacher_controllers_1.updateTeacher);
 router.delete("/", auth_1.auth, teacher_controllers_1.deleteTeacher);

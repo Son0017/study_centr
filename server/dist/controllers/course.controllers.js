@@ -12,16 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCourse = exports.deleteCourse = exports.updateCourse = exports.createCourse = void 0;
+exports.getCourses = exports.getCourse = exports.deleteCourse = exports.updateCourse = exports.createCourse = void 0;
 const prisma_1 = __importDefault(require("../connection/prisma"));
 const helperForSend_1 = require("../providers/helperForSend");
 const courseProvide_1 = require("../providers/courseProvide");
+const server_1 = require("../server");
 const createCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let body = req.body;
         body = (0, courseProvide_1.statusChaker)(body);
         const course = yield prisma_1.default.course.create({
-            data: body,
+            data: Object.assign(Object.assign({}, body), { price: Number(body.price) }),
+            include: {
+                teacher: true,
+                _count: {
+                    select: {
+                        students: true,
+                    },
+                },
+            },
         });
         return (0, helperForSend_1.createSend)(res, course);
     }
@@ -36,15 +45,13 @@ const updateCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         let body = req.body;
         const id = Number(req.params.id);
         let query = {};
-        const course = yield prisma_1.default.course.findFirst({
-            where: { id },
-        });
-        if (body.status && !(course === null || course === void 0 ? void 0 : course.status)) {
-            let started_data = body.started_data
-                ? body.started_data
-                : course === null || course === void 0 ? void 0 : course.started_data;
-            let price = body.price ? body.price : course === null || course === void 0 ? void 0 : course.price;
+        console.log(body);
+        if (body.status) {
+            let started_data = body.started_data;
+            let price = Number(body.price);
+            console.log(33);
             if (started_data && price && price > 0) {
+                console.log(22);
                 yield (0, courseProvide_1.startCourses)(Object.assign(Object.assign({}, body), { id: id }));
                 return res.status(201).send({
                     message: "Course updated successfully",
@@ -64,6 +71,9 @@ const updateCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const courseel = yield prisma_1.default.course.update({
             where: { id },
             data: Object.assign({}, query),
+            include: {
+                teacher: true,
+            },
         });
         return (0, helperForSend_1.updateSend)(res, courseel);
     }
@@ -91,11 +101,9 @@ const getCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             include: {
                 _count: {
                     select: {
-                        students: {
+                        studentDebt: {
                             where: {
-                                debt_summa: {
-                                    gt: 1000,
-                                },
+                                debt_summa: true,
                             },
                         },
                     },
@@ -109,3 +117,41 @@ const getCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getCourse = getCourse;
+const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { status, students } = req.query;
+        let query = {};
+        if (status === "group") {
+            query.status = true;
+        }
+        else if (status === "black") {
+            query.status = false;
+        }
+        let include = {};
+        if (students) {
+            include.students = students;
+            console.log(include);
+        }
+        (0, server_1.myF)();
+        const course = yield prisma_1.default.course.findMany({
+            where: {
+                AND: Object.assign({}, query),
+            },
+            include: {
+                teacher: true,
+                room: true,
+                studentDebt: true,
+                _count: {
+                    select: {
+                        students: true,
+                    },
+                },
+            },
+        });
+        return (0, helperForSend_1.getSend)(res, course);
+    }
+    catch (error) {
+        return (0, helperForSend_1.errorGet)(res, error);
+    }
+});
+exports.getCourses = getCourses;

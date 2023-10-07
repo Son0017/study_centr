@@ -22,7 +22,7 @@ const studentConnection = (body) => __awaiter(void 0, void 0, void 0, function* 
     if (body.course.status) {
         newDate = new Date();
         let findDays = (0, finfOutDay_1.findDay)(newDate);
-        debt_summa = Math.ceil((body.course.price / 30000) * findDays) * -1000;
+        debt_summa = Math.ceil((body.course.price / 30000) * findDays) * 1000;
     }
     const studentCourse = yield prisma_1.default.studentsCourses.create({
         data: {
@@ -30,6 +30,9 @@ const studentConnection = (body) => __awaiter(void 0, void 0, void 0, function* 
             course_id: body.course.id,
             debt_summa,
             student_acsept_date: newDate,
+        },
+        include: {
+            student: true,
         },
     });
     return studentCourse;

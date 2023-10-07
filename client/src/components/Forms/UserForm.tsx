@@ -27,7 +27,7 @@ const FormDisabledDemo: React.FC = () => {
           phone_number: value.phone_number,
           password: value.password,
           payout_percentage: Number(value.payout_percentage) / 100,
-          type: "TEACHER",
+          type: "ADMIN",
         },
       });
       if (data.data) {
@@ -47,10 +47,10 @@ const FormDisabledDemo: React.FC = () => {
   return (
     <Form
       name="basic"
+      form={form}
       initialValues={draw.initialValues}
       onFinish={onFinish}
       autoComplete="off"
-      form={form}
     >
       <Form.Item
         label="Familiya ism"

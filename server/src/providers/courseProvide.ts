@@ -27,6 +27,9 @@ export const startCourses = async (body: ICourse) => {
       course_id: body.id,
     },
   });
+
+  console.log(body);
+
   let newPrice = Math.ceil((body.price / 30000) * findDays) * 1000;
 
   const datas = await prisma.$transaction(async (prisma) => {

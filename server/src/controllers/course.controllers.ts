@@ -13,13 +13,25 @@ import {
 } from "../providers/helperForSend";
 import { ICourse } from "../interface/allInterface";
 import { startCourses, statusChaker } from "../providers/courseProvide";
+import { myF } from "../server";
 
 export const createCourse = async (req: Request, res: Response) => {
   try {
     let body: ICourse = req.body;
     body = statusChaker(body);
     const course = await prisma.course.create({
-      data: body,
+      data: {
+        ...body,
+        price: Number(body.price),
+      },
+      include: {
+        teacher: true,
+        _count: {
+          select: {
+            students: true,
+          },
+        },
+      },
     });
     return createSend(res, course);
   } catch (error) {
@@ -34,15 +46,16 @@ export const updateCourse = async (req: Request, res: Response) => {
     let body: ICourse = req.body;
     const id = Number(req.params.id);
     let query: any = {};
-    const course = await prisma.course.findFirst({
-      where: { id },
-    });
-    if (body.status && !course?.status) {
-      let started_data = body.started_data
-        ? body.started_data
-        : course?.started_data;
-      let price = body.price ? body.price : course?.price;
+    console.log(body);
+
+    if (body.status) {
+      let started_data = body.started_data;
+      let price = Number(body.price);
+      console.log(33);
+
       if (started_data && price && price > 0) {
+        console.log(22);
+
         await startCourses({ ...body, id: id });
         return res.status(201).send({
           message: "Course updated successfully",
@@ -61,6 +74,9 @@ export const updateCourse = async (req: Request, res: Response) => {
     const courseel = await prisma.course.update({
       where: { id },
       data: { ...query },
+      include: {
+        teacher: true,
+      },
     });
     return updateSend(res, courseel);
   } catch (error) {
@@ -86,13 +102,52 @@ export const getCourse = async (req: Request, res: Response) => {
       include: {
         _count: {
           select: {
-            students: {
+            studentDebt: {
               where: {
-                debt_summa: {
-                  gt: 1000,
-                },
+                debt_summa: true,
               },
             },
+          },
+        },
+      },
+    });
+
+    return getSend(res, course);
+  } catch (error) {
+    return errorGet(res, error);
+  }
+};
+export const getCourses = async (req: Request, res: Response) => {
+  try {
+    const { status, students } = req.query;
+    let query: any = {};
+
+    if (status === "group") {
+      query.status = true;
+    } else if (status === "black") {
+      query.status = false;
+    }
+    let include: any = {};
+    if (students) {
+      include.students = students;
+      console.log(include);
+    }
+
+    myF();
+
+    const course = await prisma.course.findMany({
+      where: {
+        AND: {
+          ...query,
+        },
+      },
+      include: {
+        teacher: true,
+        room: true,
+        studentDebt: true,
+        _count: {
+          select: {
+            students: true,
           },
         },
       },

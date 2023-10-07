@@ -3,7 +3,7 @@ import { RootState } from "./store";
 
 interface IDrawer {
   open: boolean;
-  method?: "edit" | "add";
+  method?: "PATCH" | "POST";
   component?: any;
   initialValues?: any;
   title: string;
@@ -28,6 +28,7 @@ export const drawSlice = createSlice({
       state.width = actions.payload.width;
       state.title = actions.payload.title;
       state.component = actions.payload.component;
+      state.method = actions.payload.method;
     },
   },
 });

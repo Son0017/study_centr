@@ -14,10 +14,16 @@ import {
 export const createStudent = async (req: Request, res: Response) => {
   try {
     const body = req.body;
+    console.log(body.last_name);
 
-    body.status = body.status ? body.status : false;
     const Student = await prisma.student.create({
-      data: body,
+      data: {
+        last_name: body.last_name,
+        first_name: body.first_name,
+        phone_number: body.phone_number,
+        status: body.status,
+        visited_date: body.visited_date,
+      },
     });
     createSend(res, Student);
   } catch (error) {
@@ -29,12 +35,17 @@ export const updateStudent = async (req: Request, res: Response) => {
   try {
     const body = req.body;
     const id = req.params.id;
+    let data: any = {};
+    Object.keys(body).forEach((key) => {
+      data[key] = body[key];
+    });
+
     const Student = await prisma.student.update({
       where: {
         id: Number(id),
       },
       data: {
-        ...body,
+        ...data,
       },
     });
     updateSend(res, Student);
@@ -58,9 +69,11 @@ export const deleteStudent = async (req: Request, res: Response) => {
 export const getStudent = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { search, course_id } = req.query;
     let student;
     let query: any = {};
     if (id) {
+      query.id = Number(id);
       const students = await prisma.student.findFirst({
         where: {
           ...query,
@@ -73,11 +86,35 @@ export const getStudent = async (req: Request, res: Response) => {
           },
         },
       });
-      console.log(students);
-
       student = students;
     } else {
-      const students = await prisma.student.findMany({});
+      if (course_id) {
+        query.course = {
+          every: {
+            course_id: {
+              not: Number(course_id),
+            },
+          },
+        };
+      }
+      if (search) {
+        if (Number(search)) {
+          query.id = Number(search);
+        } else {
+          query.last_name = {
+            startsWith: search ? (search as string).trim() : "",
+          };
+        }
+      }
+      const students = await prisma.student.findMany({
+        where: {
+          AND: {
+            ...query,
+          },
+        },
+        skip: 0,
+        take: 10,
+      });
       student = students;
     }
 

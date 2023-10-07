@@ -128,3 +128,15 @@ body {
   align-items: center;
   gap: 15px;
 }
+.miniButton {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.listWrapper {
+  display: flex;
+  height: 80vh;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: scroll;
+}

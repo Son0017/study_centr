@@ -14,7 +14,7 @@ export const studentConnection = async (body: IconStu) => {
   if (body.course.status) {
     newDate = new Date();
     let findDays = findDay(newDate as any);
-    debt_summa = Math.ceil((body.course.price / 30000) * findDays) * -1000;
+    debt_summa = Math.ceil((body.course.price / 30000) * findDays) * 1000;
   }
   const studentCourse = await prisma.studentsCourses.create({
     data: {
@@ -22,6 +22,9 @@ export const studentConnection = async (body: IconStu) => {
       course_id: body.course.id,
       debt_summa,
       student_acsept_date: newDate,
+    },
+    include: {
+      student: true,
     },
   });
   return studentCourse;

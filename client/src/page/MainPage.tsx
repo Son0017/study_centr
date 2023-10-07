@@ -1,7 +1,10 @@
+import { useEffect } from "react";
 import MainTable from "../components/Table";
 import type { ColumnsType } from "antd/es/table";
 import useFetchHook from "../hooks/useFetchHook";
 import { url } from "../constant/constant";
+import { setTableData } from "../context/appSlice";
+import { useAppDispatch } from "../context/store";
 
 const columns: ColumnsType<any> = [
   {
@@ -34,14 +37,25 @@ const columns: ColumnsType<any> = [
     title: "Qarzdorlar Soni",
     dataIndex: "_count",
     key: "_count",
-    render: (item: any) => item.students,
+    render: (item: any) => item?.studentDebt,
   },
 ];
 function MainPage() {
-  const { data, loading } = useFetchHook(url + "course");
+  const { data, loading, error } = useFetchHook(url + "course/home");
+  const dispatch = useAppDispatch();
+  console.log(data);
+
+  useEffect(() => {
+    dispatch(
+      setTableData({
+        tableData: data ? data : error,
+        loading: loading,
+      })
+    );
+  }, [data]);
   return (
     <>
-      <MainTable columns={columns} loading={loading} data={data} />
+      <MainTable columns={columns} />
     </>
   );
 }

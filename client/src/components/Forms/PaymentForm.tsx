@@ -19,9 +19,6 @@ const FormDisabledDemo: React.FC = () => {
           debt_summa: false,
         },
       });
-
-      console.log(data.data);
-
       if (data.data) {
         dispatch(setClose());
       }

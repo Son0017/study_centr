@@ -1,18 +1,26 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { ColumnsType } from "antd/es/table";
 import MainTable from "../components/Table";
 import useFetchHook from "../hooks/useFetchHook";
 import { Button } from "antd";
-import { DeleteFilled } from "@ant-design/icons";
-// import { Button } from "antd";
-// import { DeleteFilled } from "@ant-design/icons";
-// import axiosFetch from "../utils/axiosFetch";
+import { EditFilled } from "@ant-design/icons";
+import { setTableData } from "../context/appSlice";
+
+import { useAppDispatch } from "../hooks/reduxHook";
+import { setOpen } from "../context/drawerSlicde";
+import { TEACHER_FORM } from "../constant/constant";
 
 function Teachers() {
-  const { data } = useFetchHook("teacher");
-  const [student, setStudent] = useState<any>();
+  const { data, loading, error } = useFetchHook("teacher");
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
-    setStudent(data);
+    dispatch(
+      setTableData({
+        tableData: data ? data : error,
+        loading: loading,
+      })
+    );
   }, [data]);
   const columns: ColumnsType<any> = [
     {
@@ -47,16 +55,52 @@ function Teachers() {
       dataIndex: "type",
       key: "type",
     },
+    {
+      title: "Edit",
+      dataIndex: "status",
+      key: "status",
+      render: (_: any, r: any, index: any) => {
+        return (
+          <div className="miniButton">
+            <Button
+              onClick={() => {
+                dispatch(
+                  setOpen({
+                    open: true,
+                    title: "CREATE",
+                    component: TEACHER_FORM,
+                    method: "PATCH",
+                    initialValues: r,
+                  })
+                );
+              }}
+            >
+              <EditFilled style={{ fontSize: "14px" }}></EditFilled>
+            </Button>
+          </div>
+        );
+      },
+    },
   ];
 
   return (
     <>
-      <Button style={{ marginBottom: "20px" }}>Create</Button>
-      <MainTable
-        columns={columns}
-        data={student}
-        loading={false}
-      ></MainTable>{" "}
+      <Button
+        style={{ marginBottom: "20px" }}
+        onClick={() => {
+          dispatch(
+            setOpen({
+              open: true,
+              title: "CREATE",
+              component: TEACHER_FORM,
+              method: "POST",
+            })
+          );
+        }}
+      >
+        Create
+      </Button>
+      <MainTable columns={columns}></MainTable>
     </>
   );
 }

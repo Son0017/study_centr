@@ -18,9 +18,15 @@ const helperForSend_1 = require("../providers/helperForSend");
 const createStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = req.body;
-        body.status = body.status ? body.status : false;
+        console.log(body.last_name);
         const Student = yield prisma_1.default.student.create({
-            data: body,
+            data: {
+                last_name: body.last_name,
+                first_name: body.first_name,
+                phone_number: body.phone_number,
+                status: body.status,
+                visited_date: body.visited_date,
+            },
         });
         (0, helperForSend_1.createSend)(res, Student);
     }
@@ -33,11 +39,15 @@ const updateStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const body = req.body;
         const id = req.params.id;
+        let data = {};
+        Object.keys(body).forEach((key) => {
+            data[key] = body[key];
+        });
         const Student = yield prisma_1.default.student.update({
             where: {
                 id: Number(id),
             },
-            data: Object.assign({}, body),
+            data: Object.assign({}, data),
         });
         (0, helperForSend_1.updateSend)(res, Student);
     }
@@ -62,9 +72,11 @@ exports.deleteStudent = deleteStudent;
 const getStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
+        const { search, course_id } = req.query;
         let student;
         let query = {};
         if (id) {
+            query.id = Number(id);
             const students = yield prisma_1.default.student.findFirst({
                 where: Object.assign({}, query),
                 include: {
@@ -75,11 +87,35 @@ const getStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                     },
                 },
             });
-            console.log(students);
             student = students;
         }
         else {
-            const students = yield prisma_1.default.student.findMany({});
+            if (course_id) {
+                query.course = {
+                    every: {
+                        course_id: {
+                            not: Number(course_id),
+                        },
+                    },
+                };
+            }
+            if (search) {
+                if (Number(search)) {
+                    query.id = Number(search);
+                }
+                else {
+                    query.last_name = {
+                        startsWith: search ? search.trim() : "",
+                    };
+                }
+            }
+            const students = yield prisma_1.default.student.findMany({
+                where: {
+                    AND: Object.assign({}, query),
+                },
+                skip: 0,
+                take: 10,
+            });
             student = students;
         }
         (0, helperForSend_1.getSend)(res, student);

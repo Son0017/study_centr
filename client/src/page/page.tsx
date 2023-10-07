@@ -3,6 +3,7 @@ import Group from "./Group";
 import MainPage from "./MainPage";
 import PayOut from "./PayOut";
 import Payment from "./Payment";
+import SingleGroupPage from "./SingleGroupPage";
 import Students from "./Students";
 import Teachers from "./Teachers";
 import User from "./User";
@@ -33,12 +34,20 @@ const children = [
     element: <Students />,
   },
   {
+    path: "/admin/group/:id",
+    element: <SingleGroupPage />,
+  },
+  {
     path: "/admin/group",
     element: <Group />,
   },
   {
     path: "/admin/qoralama",
     element: <Blacklist />,
+  },
+  {
+    path: "/admin/qoralama/:id",
+    element: <SingleGroupPage />,
   },
 ];
 

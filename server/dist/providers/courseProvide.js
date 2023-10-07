@@ -41,6 +41,7 @@ const startCourses = (body) => __awaiter(void 0, void 0, void 0, function* () {
             course_id: body.id,
         },
     });
+    console.log(body);
     let newPrice = Math.ceil((body.price / 30000) * findDays) * 1000;
     const datas = yield prisma_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
         try {

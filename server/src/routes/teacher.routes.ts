@@ -12,6 +12,7 @@ import { auth } from "../auth/auth";
 const router = express.Router();
 
 router.get("/", auth, getTeacher);
+router.get("/:id", auth, getTeacher);
 router.get("/admin", auth, getAdmin);
 router.patch("/:id", auth, updateTeacher);
 router.delete("/", auth, deleteTeacher);

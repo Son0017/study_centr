@@ -4,12 +4,14 @@ import {
   getCourse,
   updateCourse,
   createCourse,
+  getCourses,
 } from "../controllers/course.controllers";
 import { cheakAdmin } from "../middlewares/cheakAdmin";
 
 const router = express.Router();
 
-router.get("/", getCourse);
+router.get("/", getCourses);
+router.get("/home", getCourse);
 
 router.patch("/:id", cheakAdmin, updateCourse);
 router.post("/", cheakAdmin, createCourse);

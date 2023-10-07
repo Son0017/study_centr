@@ -78,8 +78,8 @@ model StudentsCourses{
   debt_summa Float
   course_id Int
   student_id Int 
-  course Course @relation(fields: [course_id],references: [id])
-  student Student @relation(fields: [student_id],references: [id])
+  course Course @relation(fields: [course_id],references: [id],onDelete: Cascade)
+  student Student @relation(fields: [student_id],references: [id], onDelete: Cascade)
   @@id([student_id,course_id])
 }
 
@@ -90,9 +90,9 @@ model StudentDebt {
   summa Float
   debt_summa Boolean
   teacher_payout Float
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @unique
   updateAt DateTime @updatedAt()
-  course Course @relation(fields: [course_id],references: [id])
+  course Course @relation(fields: [course_id],references: [id] )
   student Student @relation(fields: [student_id],references: [id])
 }
 

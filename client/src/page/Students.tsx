@@ -1,18 +1,19 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { ColumnsType } from "antd/es/table";
 import MainTable from "../components/Table";
 import useFetchHook from "../hooks/useFetchHook";
-import { Button } from "antd";
-import { DeleteFilled } from "@ant-design/icons";
+import { Button, Checkbox } from "antd";
+import { setOpen } from "../context/drawerSlicde";
+import { STUDENT_FORM } from "../constant/constant";
+import { editTableData, setTableData } from "../context/appSlice";
+import { useAppDispatch } from "../hooks/reduxHook";
+import { EditFilled } from "@ant-design/icons";
 import axiosFetch from "../utils/axiosFetch";
 
 function Students() {
-  const { data } = useFetchHook("student");
-  const [student, setStudent] = useState<any>();
-  useEffect(() => {
-    setStudent(data);
-  }, [data]);
+  const { data, loading, error } = useFetchHook("student");
 
+  const dispatch = useAppDispatch();
   const columns: ColumnsType<any> = [
     {
       title: "№",
@@ -34,18 +35,87 @@ function Students() {
       key: "phone_number",
     },
     {
-      title: "O'chirish",
+      title: "Status",
       dataIndex: "status",
       key: "status",
       render: (_: any, r: any, index: any) => {
         return _ ? "Active" : "Disabled";
       },
     },
+    {
+      title: "Edit",
+      dataIndex: "status",
+      key: "status",
+      render: (_: any, r: any, index: any) => {
+        return (
+          <div className="miniButton">
+            <Button
+              onClick={() => {
+                dispatch(
+                  setOpen({
+                    open: true,
+                    title: "CREATE",
+                    component: STUDENT_FORM,
+                    method: "PATCH",
+                    initialValues: r,
+                  })
+                );
+              }}
+            >
+              <EditFilled style={{ fontSize: "14px" }}></EditFilled>
+            </Button>
+            <Checkbox
+              checked={_}
+              onChange={async () => {
+                try {
+                  const data = await axiosFetch("student/" + r.id, {
+                    method: "PATCH",
+                    data: {
+                      status: _ ? false : true,
+                    },
+                  });
+                  console.log(data);
+
+                  if (data.data) {
+                    dispatch(editTableData(data.data.data));
+                  }
+                } catch (error) {
+                  console.log(error);
+                }
+              }}
+            ></Checkbox>
+          </div>
+        );
+      },
+    },
   ];
+  useEffect(() => {
+    dispatch(
+      setTableData({
+        tableData: data ? data : error,
+        loading: loading,
+      })
+    );
+  }, [data]);
 
   return (
     <>
-      <MainTable columns={columns} data={student} loading={false}></MainTable>{" "}
+      <Button
+        style={{ marginBottom: "20px" }}
+        onClick={() => {
+          dispatch(
+            setOpen({
+              open: true,
+              title: "CREATE",
+              component: STUDENT_FORM,
+              method: "POST",
+            })
+          );
+        }}
+      >
+        Create
+      </Button>
+      <MainTable columns={columns}></MainTable>
     </>
   );
 }
