@@ -1,41 +1,32 @@
-import React from "react";
-
-import { Avatar, Layout, MenuProps, theme } from "antd";
-import Navbar from "../components/Sider";
-import Search from "antd/es/input/Search";
-import {
-  GroupOutlined,
-  HomeFilled,
-  MoneyCollectFilled,
-  UserAddOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { Outlet } from "react-router-dom";
+import { Avatar, Layout } from "antd";
 import MainDrawer from "../components/MainDrawer";
+import Navbar from "../components/Sider";
+import { Content, Header } from "antd/es/layout/layout";
+import Search from "antd/es/input/Search";
+import { GroupOutlined, UserAddOutlined } from "@ant-design/icons";
+import { Outlet } from "react-router-dom";
+import { HomeFilled } from "@ant-design/icons";
+import { MenuProps, theme } from "antd";
+import React from "react";
 import { useAppSelector } from "../hooks/reduxHook";
 import { selectUser } from "../context/userSlice";
-const { Header, Content } = Layout;
+
 const items: MenuProps["items"] = [
-  { icon: HomeFilled, title: "Home", path: "/admin" },
-  { icon: MoneyCollectFilled, title: "To'lov", path: "/admin/tolov" },
-  { icon: MoneyCollectFilled, title: "Oylik", path: "/admin/oylik" },
-  { icon: UserOutlined, title: "Abuturent", path: "/admin/abuturent" },
-  { icon: UserOutlined, title: "O'qituvchi", path: "/admin/oqituvchi" },
-  { icon: UserOutlined, title: "Admin", path: "/admin/user" },
-  { icon: GroupOutlined, title: "Group", path: "/admin/group" },
-  { icon: GroupOutlined, title: "Qoralama", path: "/admin/qoralama" },
+  { icon: HomeFilled, title: "Home", path: "/teacher" },
+  { icon: GroupOutlined, title: "Group", path: "/teacher/group" },
 ].map((item) => ({
   key: item.path,
   icon: React.createElement(item.icon),
   label: item.title,
 }));
 
-const MainLayout: React.FC = () => {
+function TeacherLayout() {
   const user = useAppSelector(selectUser);
+  console.log(user);
+
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-
   return (
     <Layout className="mainLayout">
       <MainDrawer></MainDrawer>
@@ -66,6 +57,6 @@ const MainLayout: React.FC = () => {
       </Layout>
     </Layout>
   );
-};
+}
 
-export default MainLayout;
+export default TeacherLayout;

@@ -19,3 +19,4 @@ export const MONTH = [
   "noyabr",
   "dekabr",
 ];
+export const weeks = ["du", "se", "chor", "pay", "ju", "shan"];

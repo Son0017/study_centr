@@ -121,16 +121,20 @@ export const getCourses = async (req: Request, res: Response) => {
   try {
     const { status, students } = req.query;
     let query: any = {};
-
+    const user = (req as custumRequest).user;
     if (status === "group") {
       query.status = true;
     } else if (status === "black") {
       query.status = false;
     }
     let include: any = {};
+
+    if (user.type === "TEACHER") {
+      query.teacher_id = user.id;
+    }
+
     if (students) {
       include.students = students;
-      console.log(include);
     }
 
     myF();
@@ -144,7 +148,6 @@ export const getCourses = async (req: Request, res: Response) => {
       include: {
         teacher: true,
         room: true,
-        studentDebt: true,
         _count: {
           select: {
             students: true,

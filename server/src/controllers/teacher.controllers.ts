@@ -16,6 +16,7 @@ import jwt from "jsonwebtoken";
 export const createTeacher = async (req: Request, res: Response) => {
   try {
     const body = req.body;
+    body.summa = 0;
     const teacher = await prisma.user.create({
       data: body,
     });
@@ -90,16 +91,29 @@ export const deleteTeacher = async (req: Request, res: Response) => {
 
 export const getTeacher = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { teacher_id } = req.query;
+    const { id, type } = (req as custumRequest).user;
+    let student: any;
     let query: any = {};
-    if (id) {
+
+    if (teacher_id) {
       query = { id: Number(id) };
+      student = await prisma.user.findFirst({
+        where: {
+          ...query,
+        },
+        include: {
+          course: true,
+        },
+      });
+    } else if (type === "ADMIN") {
+      student = await prisma.user.findMany({
+        where: {
+          type: "TEACHER",
+        },
+      });
     }
-    const student = await prisma.user.findMany({
-      where: {
-        type: "TEACHER",
-      },
-    });
+
     getSend(res, student);
   } catch (error) {
     errorGet(res, error);
@@ -125,14 +139,14 @@ export const getAdmin = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { phone_number, password } = req.body;
-    const user = await prisma.user.findFirst({
+
+    const user = await prisma.user.findUnique({
       where: {
-        AND: {
-          phone_number,
-          password,
-        },
+        phone_number,
+        password,
       },
     });
+
     const token = jwt.sign(
       { id: user?.id, type: user?.type },
       process.env.SECRET_KEY as string,
@@ -145,7 +159,7 @@ export const login = async (req: Request, res: Response) => {
       })
       .send({ ...user, token });
   } catch (error: any) {
-    res.status(505).send({
+    res.status(507).send({
       message: error.message,
     });
   }

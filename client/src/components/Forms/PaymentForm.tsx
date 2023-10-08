@@ -5,6 +5,7 @@ import { Button, Form, Input } from "antd";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHook";
 import { selectDraw, setClose } from "../../context/drawerSlicde";
 import axiosFetch from "../../utils/axiosFetch";
+import { setMessage } from "../../context/appSlice";
 
 const FormDisabledDemo: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,6 +22,12 @@ const FormDisabledDemo: React.FC = () => {
       });
       if (data.data) {
         dispatch(setClose());
+        dispatch(
+          setMessage({
+            type: "success",
+            content: "tolandi",
+          })
+        );
       }
     } catch (error) {
       console.log(error);

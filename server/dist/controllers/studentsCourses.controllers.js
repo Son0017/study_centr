@@ -45,10 +45,11 @@ exports.createStudentCourse = createStudentCourse;
 const getStudentCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        console.log(id);
         const data = yield prisma_1.default.studentsCourses.findMany({
             where: {
-                course_id: Number(id),
+                AND: {
+                    course_id: Number(id),
+                },
             },
             include: {
                 student: true,

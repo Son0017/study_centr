@@ -5,6 +5,7 @@ import { selectDraw, setClose } from "../../context/drawerSlicde";
 import axiosFetch from "../../utils/axiosFetch";
 import { editTableData, pushTableData } from "../../context/appSlice";
 import useFetchHook from "../../hooks/useFetchHook";
+import { weeks } from "../../constant/constant";
 
 const FormDisabledDemo: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -78,7 +79,6 @@ const FormDisabledDemo: React.FC = () => {
       if (data.data?.succes) {
         if (draw.method === "POST") {
           dispatch(pushTableData(data.data.data));
-        } else if (status) {
         } else {
           dispatch(editTableData(data.data.data));
         }
@@ -139,24 +139,13 @@ const FormDisabledDemo: React.FC = () => {
       >
         <Checkbox.Group style={{ width: "100%" }} name="week_days">
           <Row>
-            <Col span={8}>
-              <Checkbox value="du">Du</Checkbox>
-            </Col>
-            <Col span={8}>
-              <Checkbox value="se">Se</Checkbox>
-            </Col>
-            <Col span={8}>
-              <Checkbox value="chor">chor</Checkbox>
-            </Col>
-            <Col span={8}>
-              <Checkbox value="pay">pay</Checkbox>
-            </Col>
-            <Col span={8}>
-              <Checkbox value="ju">ju</Checkbox>
-            </Col>
-            <Col span={8}>
-              <Checkbox value="shan">shan</Checkbox>
-            </Col>
+            {weeks.map((item, i) => {
+              return (
+                <Col span={8}>
+                  <Checkbox value={item}>{item}</Checkbox>
+                </Col>
+              );
+            })}
           </Row>
         </Checkbox.Group>
       </Form.Item>

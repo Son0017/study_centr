@@ -6,12 +6,17 @@ interface Iapper {
   searchData?: any[];
   loading: boolean;
   status?: boolean;
+  message?: any;
 }
 
 const initialState: Iapper = {
   tableData: [],
   searchData: [],
   loading: false,
+  message: {
+    type: "success",
+    content: "Welcome",
+  },
 };
 
 export const appSlice = createSlice({
@@ -20,19 +25,33 @@ export const appSlice = createSlice({
   reducers: {
     statusChange: (state, action: PayloadAction<any>) => {
       state.status = action.payload;
+      state.message = {
+        type: "success",
+        content: "Status o'zgardi",
+      };
     },
     setTableData: (state, actions: PayloadAction<Iapper>) => {
       state.tableData = actions.payload.tableData;
-
       state.loading = actions.payload.loading;
     },
     pushTableData: (state, actions: PayloadAction<Iapper>) => {
       state.tableData.push(actions.payload);
+      state.message = {
+        type: "success",
+        content: "Qo'shildi",
+      };
     },
     deleteTableData: (state, actions: PayloadAction<any>) => {
       state.tableData = state.tableData.filter(
         (item: any) => item.id !== actions.payload.id
       );
+      state.message = {
+        type: "success",
+        content: "Ochirildi",
+      };
+    },
+    setMessage: (state, actions: PayloadAction<any>) => {
+      state.message = actions.payload;
     },
     editTableData: (state, actions: PayloadAction<any>) => {
       state.tableData = state.tableData.map((item: any) => {
@@ -42,6 +61,10 @@ export const appSlice = createSlice({
           return actions.payload;
         }
       });
+      state.message = {
+        type: "success",
+        content: "Yangilandi",
+      };
     },
   },
 });
@@ -52,6 +75,7 @@ export const {
   deleteTableData,
   editTableData,
   statusChange,
+  setMessage,
 } = appSlice.actions;
 
 export const selectapp = (state: RootState) => state.app;

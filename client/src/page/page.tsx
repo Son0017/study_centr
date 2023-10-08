@@ -1,3 +1,4 @@
+import AttendancePage from "./AttendancePage";
 import Blacklist from "./Blacklist";
 import Group from "./Group";
 import MainPage from "./MainPage";
@@ -5,6 +6,8 @@ import PayOut from "./PayOut";
 import Payment from "./Payment";
 import SingleGroupPage from "./SingleGroupPage";
 import Students from "./Students";
+import TeacherGroup from "./TeacherGroup";
+import TeacherMain from "./TeacherMain";
 import Teachers from "./Teachers";
 import User from "./User";
 
@@ -51,6 +54,20 @@ const children = [
   },
 ];
 
+const teachChildren = [
+  {
+    path: "/teacher",
+    element: <TeacherMain />,
+  },
+  {
+    path: "/teacher/group",
+    element: <TeacherGroup />,
+  },
+  {
+    path: "/teacher/group/:id",
+    element: <AttendancePage />,
+  },
+];
 export {
   Payment,
   Blacklist,
@@ -60,5 +77,6 @@ export {
   Students,
   Teachers,
   User,
+  teachChildren,
   children,
 };

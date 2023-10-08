@@ -2,13 +2,13 @@ import express from "express";
 import { config } from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
 import courseRouter from "./routes/course.routes";
 import roomRouter from "./routes/room.routes";
 import studentRouter from "./routes/student.routes";
 import studentDebtRouter from "./routes/studentDebt.routes";
 import studentsCoursesRouter from "./routes/studentsCourses.routes";
 import teacherRouter from "./routes/teacher.routes";
+import attendance from "./routes/attendance.routes";
 import { auth } from "./auth/auth";
 import prisma from "./connection/prisma";
 config();
@@ -24,6 +24,7 @@ app.use(
 app.use(cookieParser());
 
 app.use("/course", auth, courseRouter);
+app.use("/attendance", auth, attendance);
 app.use("/student", auth, studentRouter);
 app.use("/teacher", teacherRouter);
 app.use("/studentDebt", auth, studentDebtRouter);

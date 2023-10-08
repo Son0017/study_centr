@@ -8,6 +8,7 @@ const course_controllers_1 = require("../controllers/course.controllers");
 const cheakAdmin_1 = require("../middlewares/cheakAdmin");
 const router = express_1.default.Router();
 router.get("/", course_controllers_1.getCourses);
+router.get("/home/:id", course_controllers_1.getCourse);
 router.get("/home", course_controllers_1.getCourse);
 router.patch("/:id", cheakAdmin_1.cheakAdmin, course_controllers_1.updateCourse);
 router.post("/", cheakAdmin_1.cheakAdmin, course_controllers_1.createCourse);

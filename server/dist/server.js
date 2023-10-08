@@ -23,6 +23,7 @@ const student_routes_1 = __importDefault(require("./routes/student.routes"));
 const studentDebt_routes_1 = __importDefault(require("./routes/studentDebt.routes"));
 const studentsCourses_routes_1 = __importDefault(require("./routes/studentsCourses.routes"));
 const teacher_routes_1 = __importDefault(require("./routes/teacher.routes"));
+const attendance_routes_1 = __importDefault(require("./routes/attendance.routes"));
 const auth_1 = require("./auth/auth");
 const prisma_1 = __importDefault(require("./connection/prisma"));
 (0, dotenv_1.config)();
@@ -34,6 +35,7 @@ app.use((0, cors_1.default)({
 }));
 app.use((0, cookie_parser_1.default)());
 app.use("/course", auth_1.auth, course_routes_1.default);
+app.use("/attendance", auth_1.auth, attendance_routes_1.default);
 app.use("/student", auth_1.auth, student_routes_1.default);
 app.use("/teacher", teacher_routes_1.default);
 app.use("/studentDebt", auth_1.auth, studentDebt_routes_1.default);

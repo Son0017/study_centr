@@ -4,19 +4,33 @@ import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { Provider } from "react-redux";
-import { children } from "./page/page.tsx";
+import { children, teachChildren } from "./page/page.tsx";
 import { store } from "./context/store.ts";
 import Login from "./page/Login.tsx";
+import Teacher from "./Teacher.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <ProtectedRoute></ProtectedRoute>,
+    element: <ProtectedRoute>{}</ProtectedRoute>,
   },
   {
     path: "/admin",
-    element: <App />,
+    element: (
+      <ProtectedRoute>
+        <App />
+      </ProtectedRoute>
+    ),
     children: children,
+  },
+  {
+    path: "/teacher",
+    element: (
+      <ProtectedRoute>
+        <Teacher />
+      </ProtectedRoute>
+    ),
+    children: teachChildren,
   },
   {
     path: "/login",

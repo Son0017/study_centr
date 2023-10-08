@@ -11,6 +11,7 @@ import { cheakAdmin } from "../middlewares/cheakAdmin";
 const router = express.Router();
 
 router.get("/", getCourses);
+router.get("/home/:id", getCourse);
 router.get("/home", getCourse);
 
 router.patch("/:id", cheakAdmin, updateCourse);

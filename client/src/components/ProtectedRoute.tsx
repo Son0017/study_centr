@@ -1,21 +1,41 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-function ProtectedRoute() {
+import { useAppDispatch } from "../hooks/reduxHook";
+import { setUser } from "../context/userSlice";
+function ProtectedRoute({ children }: { children: any }) {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const user = JSON.parse(localStorage.getItem("user") as string);
+  const location = useLocation();
   useEffect(() => {
-    console.log(user);
+    if (location.pathname === "/") {
+      if (!user) {
+        navigate("/login");
+      } else if (user.type === "ADMIN") {
+        navigate("/admin");
+        document.cookie = `token=${user.token}`;
+        return children;
+      } else if (user.type === "TEACHER") {
+        navigate("/teacher");
+        document.cookie = `token=${user.token}`;
+        return children;
+      }
+    }
 
     if (!user) {
       navigate("/login");
     } else if (user.type === "ADMIN") {
-      console.log(1);
+      dispatch(setUser(user));
       document.cookie = `token=${user.token}`;
-      navigate("/admin");
+      return children;
+    } else if (user.type === "TEACHER") {
+      dispatch(setUser(user));
+      document.cookie = `token=${user.token}`;
+      return children;
     }
   }, []);
 
-  return <></>;
+  return <>{children}</>;
 }
 
 export default ProtectedRoute;

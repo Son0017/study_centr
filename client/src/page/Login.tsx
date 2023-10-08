@@ -44,7 +44,7 @@ const Login: React.FC = () => {
           onFinish={onFinish}
         >
           <Form.Item
-            name="login"
+            name="phone_number"
             rules={[{ required: true, message: "Please input your Login!" }]}
           >
             <Input

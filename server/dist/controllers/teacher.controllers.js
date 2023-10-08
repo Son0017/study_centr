@@ -19,6 +19,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const createTeacher = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = req.body;
+        body.summa = 0;
         const teacher = yield prisma_1.default.user.create({
             data: body,
         });
@@ -96,16 +97,26 @@ const deleteTeacher = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.deleteTeacher = deleteTeacher;
 const getTeacher = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.params;
+        const { teacher_id } = req.query;
+        const { id, type } = req.user;
+        let student;
         let query = {};
-        if (id) {
+        if (teacher_id) {
             query = { id: Number(id) };
+            student = yield prisma_1.default.user.findFirst({
+                where: Object.assign({}, query),
+                include: {
+                    course: true,
+                },
+            });
         }
-        const student = yield prisma_1.default.user.findMany({
-            where: {
-                type: "TEACHER",
-            },
-        });
+        else if (type === "ADMIN") {
+            student = yield prisma_1.default.user.findMany({
+                where: {
+                    type: "TEACHER",
+                },
+            });
+        }
         (0, helperForSend_1.getSend)(res, student);
     }
     catch (error) {
@@ -135,12 +146,10 @@ exports.getAdmin = getAdmin;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { phone_number, password } = req.body;
-        const user = yield prisma_1.default.user.findFirst({
+        const user = yield prisma_1.default.user.findUnique({
             where: {
-                AND: {
-                    phone_number,
-                    password,
-                },
+                phone_number,
+                password,
             },
         });
         const token = jsonwebtoken_1.default.sign({ id: user === null || user === void 0 ? void 0 : user.id, type: user === null || user === void 0 ? void 0 : user.type }, process.env.SECRET_KEY, { expiresIn: "30d" });
@@ -152,7 +161,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             .send(Object.assign(Object.assign({}, user), { token }));
     }
     catch (error) {
-        res.status(505).send({
+        res.status(507).send({
             message: error.message,
         });
     }

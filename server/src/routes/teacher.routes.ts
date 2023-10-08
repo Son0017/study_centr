@@ -16,6 +16,6 @@ router.get("/:id", auth, getTeacher);
 router.get("/admin", auth, getAdmin);
 router.patch("/:id", auth, updateTeacher);
 router.delete("/", auth, deleteTeacher);
-router.post("/", auth, createTeacher);
 router.post("/login", login);
+router.post("/", auth, createTeacher);
 export default router;

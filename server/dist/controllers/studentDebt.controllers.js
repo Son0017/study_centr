@@ -33,13 +33,35 @@ const updateStudentDebt = (req, res) => __awaiter(void 0, void 0, void 0, functi
     try {
         const body = req.body;
         const id = req.params.id;
-        const studentDebt = yield prisma_1.default.studentDebt.update({
-            where: {
-                id: Number(id),
-            },
-            data: Object.assign({}, body),
-        });
-        (0, helperForSend_1.updateSend)(res, studentDebt);
+        const debt = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+            const status = yield tx.studentDebt.findFirst({
+                where: {
+                    id: Number(id),
+                },
+                include: {
+                    course: true,
+                },
+            });
+            const studentDebt = yield tx.studentDebt.update({
+                where: {
+                    id: Number(id),
+                },
+                data: Object.assign({}, body),
+            });
+            const user = yield tx.user.update({
+                where: {
+                    id: status === null || status === void 0 ? void 0 : status.course.teacher_id,
+                },
+                data: {
+                    summa: {
+                        increment: (status === null || status === void 0 ? void 0 : status.summa) * 0.5,
+                    },
+                },
+            });
+            return { studentDebt, status, user };
+        }));
+        console.log(debt);
+        (0, helperForSend_1.updateSend)(res, debt.studentDebt);
     }
     catch (error) {
         (0, helperForSend_1.errorCreate)(res, error);
@@ -67,21 +89,15 @@ const deleteStudentDebt = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.deleteStudentDebt = deleteStudentDebt;
 const getStudentDebt = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let { limit, offset } = req.query;
         const { id } = req.params;
-        let take = limit ? Number(limit) : 10;
-        let skip = offset ? Number(offset) : 0;
         let query = {};
         if (id) {
             query.student_id = Number(id);
         }
-        console.log(query);
         const data = yield prisma_1.default.studentDebt.findMany({
             where: {
                 AND: Object.assign({ debt_summa: true }, query),
             },
-            take: take,
-            skip: skip,
             include: {
                 student: true,
                 course: true,

@@ -4,6 +4,8 @@ import Selected from "../components/Selected";
 import useFetchHook from "../hooks/useFetchHook";
 import axiosFetch from "../utils/axiosFetch";
 import { Input } from "antd";
+import { useAppDispatch } from "../hooks/reduxHook";
+import { setMessage } from "../context/appSlice";
 // import { useAppDispatch } from "../hooks/reduxHook";
 // import { setOpen } from "../context/drawerSlicde";
 // import { PAY_FORM } from "../constant/constant";
@@ -22,8 +24,6 @@ function Payment() {
       let search = e.target.value;
       const data = await axiosFetch("studentDebt/" + search);
       const res = data.data;
-      console.log(res);
-
       setStudents(res.data);
     } catch (error) {
       console.log(error);

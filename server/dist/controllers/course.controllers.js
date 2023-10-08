@@ -121,6 +121,7 @@ const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const { status, students } = req.query;
         let query = {};
+        const user = req.user;
         if (status === "group") {
             query.status = true;
         }
@@ -128,9 +129,11 @@ const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             query.status = false;
         }
         let include = {};
+        if (user.type === "TEACHER") {
+            query.teacher_id = user.id;
+        }
         if (students) {
             include.students = students;
-            console.log(include);
         }
         (0, server_1.myF)();
         const course = yield prisma_1.default.course.findMany({
@@ -140,7 +143,6 @@ const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             include: {
                 teacher: true,
                 room: true,
-                studentDebt: true,
                 _count: {
                     select: {
                         students: true,
