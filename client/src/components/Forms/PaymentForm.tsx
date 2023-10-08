@@ -9,9 +9,7 @@ import { setMessage } from "../../context/appSlice";
 
 const FormDisabledDemo: React.FC = () => {
   const dispatch = useAppDispatch();
-
   const draw = useAppSelector(selectDraw);
-
   const onFinish = async () => {
     try {
       const data = await axiosFetch("studentDebt/" + draw.initialValues.id, {
